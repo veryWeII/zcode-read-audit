@@ -1,7 +1,7 @@
 {
   "name": "zcode-read-audit",
-  "version": "1.1.0",
-  "description": "ZCode 文件读取审计:每轮读取清单(行级范围)+ 会话累计明细 + /reads 查询,脚本算清单、模型只复读",
+  "version": "1.2.0",
+  "description": "ZCode 文件读取审计:每轮读取清单(行级范围/子代理覆盖)+ 会话累计明细 + /reads 查询,直查原生库,脚本算清单、模型只复读",
   "author": { "name": "verywell" },
   "license": "MIT",
   "commands": "commands",

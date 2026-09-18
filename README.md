@@ -13,6 +13,17 @@ ZCode 桌面端的**文件读取审计工具**:让 AI 每轮对话读过的文�
 
 ## 安装
 
+### 方式一:ZCode 插件(推荐,零配置)
+
+1. ZCode → 设置 → 插件管理 → 发现(Discover)→ `+` 添加市场:本仓库的 **GitHub 地址**或**本地目录**;
+2. 安装 `zcode-read-audit`,完成。禁用/卸载同样在插件管理里一键操作。
+
+插件模式零依赖即可用(每轮清单、行级范围、会话累计、`/reads`),hook 由插件自动启用,**新开的对话**立即生效。需要全局审计库(gryph)与仪表盘时,克隆本仓库走方式二。
+
+> ⚠ 两种方式**二选一**:同时启用会双份记账、双份清单。从方式二切到方式一,先 `node setup.js --revert` 摘除旧 hooks。
+
+### 方式二:setup.js(增强模式,含 gryph 转发与仪表盘)
+
 ```bash
 # 1. 依赖:gryph(可选,没有则仅少全局审计/仪表盘)
 npm i -g @safedep/gryph
@@ -28,13 +39,17 @@ npm start
 
 **生效时机**:hook 配置按「内部会话创建」加载——安装后**新开的对话**立即生效;已开的旧对话要等重启/上下文压缩/fork 后切换。
 
+### 设置
+
+- `~/.zcode/read-audit/settings.json` → `{"restructure": false}`:关闭「摘要+完整说明」内容层折叠,回到仅在回复末尾追加裸清单;缺省(或删除该文件)= 开启。插件模式下也可经插件设置界面(userConfig `restructure`)切换,两者取前者优先。
+- `paths.json`(仅方式二)记录 gryph 路径/数据目录/仪表盘端口,换机器重跑 `setup.js` 再生成。
+
 ## 卸载
 
-```bash
-node setup.js --revert
-```
+- 插件模式:插件管理里卸载/禁用即可,hook 随插件停止贡献;
+- setup.js 模式:`node setup.js --revert`,只摘除本工具注册的 hooks 与 `/reads` 命令,不动其他配置。
 
-只摘除本工具注册的 hooks 与 `/reads` 命令,不动其他配置;数据目录(`~/.zcode/read-audit/`)保留,可手动删除。
+两种模式的数据目录(`~/.zcode/read-audit/`)均保留,可手动删除。
 
 ## 工作原理
 

@@ -1,0 +1,30 @@
+{
+  "hooks": {
+    "PostToolUse": [
+      {
+        "hooks": [
+          {
+            "type": "process",
+            "command": "node",
+            "args": ["${ZCODE_PLUGIN_ROOT}/lib/tool-ledger.js"],
+            "timeoutMs": 10000,
+            "statusMessage": "read-audit: 记账"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "process",
+            "command": "node",
+            "args": ["${ZCODE_PLUGIN_ROOT}/lib/stop-hook.js", "${user_config.restructure}"],
+            "timeoutMs": 25000,
+            "statusMessage": "read-audit: 汇总本轮读取文件"
+          }
+        ]
+      }
+    ]
+  }
+}

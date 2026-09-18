@@ -29,7 +29,7 @@ cat ~/.zcode/read-audit/ledger.jsonl 2>/dev/null | grep -i "关键词"
 gryph query --action file_read --format json --today
 ```
 
-在结果中过滤 Path 包含关键词的记录,明确回答「已读/未读」,列出:读取时间、会话ID、完整路径、来源(Read 工具还是 shell 推定)。若都未读,再用 `gryph logs --format json --today` 检查 Command 字段是否含关键词(cat/grep 间接读)。
+在结果中过滤 Path 包含关键词的记录,明确回答「已读/未读」,列出:读取时间、会话ID、完整路径、来源(Read 工具还是 shell 推定);账本命中行若含非零 `off`/`lim` 字段,一并列出行范围(如 `10–50 行`,缺省为全文)。若都未读,再用 `gryph logs --format json --today` 检查 Command 字段是否含关键词(cat/grep 间接读)。
 
 ## 参数是会话ID(8位短ID):复盘该会话
 ```bash

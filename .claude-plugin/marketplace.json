@@ -1,0 +1,17 @@
+{
+  "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
+  "name": "zcode-read-audit",
+  "description": "zcode-read-audit 插件市场:ZCode 文件读取审计(每轮清单/行级范围/会话累计/reads 查询)",
+  "owner": {
+    "name": "verywell"
+  },
+  "plugins": [
+    {
+      "name": "zcode-read-audit",
+      "description": "ZCode 文件读取审计:每轮读取清单(行级范围)+ 会话累计明细 + /reads 查询,脚本算清单、模型只复读",
+      "author": { "name": "verywell" },
+      "category": "audit",
+      "source": "./"
+    }
+  ]
+}

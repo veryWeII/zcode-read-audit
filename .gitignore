@@ -1,0 +1,9 @@
+# 机器相关产物(setup.js 生成)
+paths.json
+
+# 运行数据(默认在 ~/.zcode/read-audit,若手动放入仓库则忽略)
+*.log
+.stop-*
+ledger.jsonl
+
+node_modules/

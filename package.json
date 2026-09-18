@@ -1,0 +1,15 @@
+{
+  "name": "zcode-read-audit",
+  "version": "1.0.0",
+  "description": "ZCode 文件读取审计:每轮自动清单(Stop hook)+ 实时仪表盘 + /reads 命令,基于 gryph",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "start": "node lib/server.js",
+    "setup": "node setup.js",
+    "revert": "node setup.js --revert"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

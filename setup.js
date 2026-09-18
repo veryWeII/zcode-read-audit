@@ -25,6 +25,7 @@ const dataDir = path.join(zcodeDir, 'read-audit');
 
 function log(msg) { console.log('[setup] ' + msg); }
 
+// 探测 gryph 绝对路径:where/which 可能同时命中 .exe 与无扩展名的 shim,优先 .exe(直接 spawn 最稳)
 function findGryph() {
   try {
     const out = execSync(isWin ? 'where gryph' : 'which gryph', { encoding: 'utf8', stdio: ['pipe', 'pipe', 'ignore'] });
@@ -67,6 +68,8 @@ function installHooks(config, nodeExe, gryphExe) {
   config.hooks.enabled = true;
   if (!config.hooks.events) config.hooks.events = {};
 
+  // 超时余量:gryph 转发 25s(长会话 transcript 大、入库慢,丢事件不影响本轮清单);
+  // 本地脚本纯追加/纯读,实际毫秒级,下面给的时限只是保险丝
   const script = (name, timeoutMs, msg) => ({
     type: 'process', command: nodeExe, args: [path.join(repoDir, 'lib', name)],
     timeoutMs, statusMessage: 'read-audit: ' + msg

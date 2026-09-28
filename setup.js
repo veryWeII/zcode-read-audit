@@ -8,9 +8,11 @@
 //   2. 生成 paths.json(机器相关,已 gitignore)
 //   3. 备份 ~/.zcode/cli/config.json 后,幂等合并 hooks:
 //      SessionStart/UserPromptSubmit/PostToolUse/PostToolUseFailure → gryph 审计转发
-//      PostToolUse 另挂 tool-ledger.js 记账;Stop 挂 stop-hook.js 生成本轮清单
-//   4. 复制 commands/reads.md → ~/.zcode/commands/(聊天内 /reads 命令)
-//   5. 创建数据目录 ~/.zcode/read-audit/
+//      PostToolUse 另挂 tool-ledger.js 记账;Stop 挂 stop-hook.js(每轮自动在回复末尾
+//      追加可折叠审计区域,正文原文不动;settings.json 的 auto=false 可关)
+//   4. 复制 commands/*.md → ~/.zcode/commands/(聊天内 /audit、/reads 命令)
+//   5. 生成 ~/.zcode/read-audit/report.js 启动器(转发到本仓库 lib/report.js)
+//   6. 创建数据目录 ~/.zcode/read-audit/
 const fs = require('fs');
 const os = require('os');
 const path = require('path');
@@ -92,7 +94,18 @@ function installHooks(config, nodeExe, gryphExe) {
     upsert('PostToolUse', [script('tool-ledger.js', 10000, '记账')]);
     log('⚠ 未找到 gryph,已跳过 gryph 审计转发(仅记账+每轮清单可用);安装: npm i -g @safedep/gryph 后重跑');
   }
-  upsert('Stop', [script('stop-hook.js', 25000, '汇总本轮读取文件')]);
+  upsert('Stop', [script('stop-hook.js', 25000, '追加审计清单')]);
+}
+
+// /audit 命令的启动器:稳定路径 ~/.zcode/read-audit/report.js,内部转发到本仓库 lib/report.js。
+// 插件模式不经 setup.js,由命令文件回退 find 定位插件缓存内脚本,与本启动器互不干扰。
+function writeReportLauncher() {
+  const target = path.join(dataDir, 'report.js');
+  fs.writeFileSync(target,
+    '#!/usr/bin/env node\n' +
+    '// 由 setup.js 生成:转发到本仓库 lib/report.js(/audit 命令用;可随时重跑 setup.js 再生成)\n' +
+    "process.env.READ_AUDIT_REPORT_LAUNCH = '1';\n" +
+    'require(' + JSON.stringify(path.join(repoDir, 'lib', 'report.js')) + ');\n');
 }
 
 function main() {
@@ -106,6 +119,8 @@ function main() {
     stripOurs(config);
     fs.writeFileSync(cliConfig, JSON.stringify(config, null, 2));
     try { fs.rmSync(path.join(commandsDir, 'reads.md')); log('已移除 /reads 命令'); } catch {}
+    try { fs.rmSync(path.join(commandsDir, 'audit.md')); log('已移除 /audit 命令'); } catch {}
+    try { fs.rmSync(path.join(dataDir, 'report.js')); log('已移除 report 启动器'); } catch {}
     try { fs.rmSync(path.join(repoDir, 'paths.json')); } catch {}
     log('已摘除本工具全部 hooks(其他配置未动)。已开的会话要等新会话才彻底脱离;数据目录保留:' + dataDir);
     return;
@@ -128,12 +143,15 @@ function main() {
 
   fs.mkdirSync(commandsDir, { recursive: true });
   fs.copyFileSync(path.join(repoDir, 'commands', 'reads.md'), path.join(commandsDir, 'reads.md'));
+  fs.copyFileSync(path.join(repoDir, 'commands', 'audit.md'), path.join(commandsDir, 'audit.md'));
+  writeReportLauncher();
 
   log('安装完成:');
   log('  • hooks 已写入 ' + cliConfig + '(备份: *.bak-read-audit-' + stamp + ')');
-  log('  • /reads 命令已安装到 ' + path.join(commandsDir, 'reads.md'));
-  log('  • 数据目录: ' + dataDir);
+  log('  • /audit 与 /reads 命令已安装到 ' + commandsDir);
+  log('  • 数据目录: ' + dataDir + '(含 report.js 启动器)');
   log('注意:hook 配置按「内部会话创建」加载——已开的对话需新开对话/重启/上下文压缩后生效');
+  log('每轮自动追加审计清单默认开启(原回复逐字保留,仅末尾追加折叠区域);要零打扰:~/.zcode/read-audit/settings.json 写 {"auto":false}');
   log('仪表盘: npm start  →  http://127.0.0.1:7431');
 }
 

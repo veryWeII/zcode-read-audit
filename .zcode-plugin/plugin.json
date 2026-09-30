@@ -1,6 +1,6 @@
 {
   "name": "zcode-read-audit",
-  "version": "1.4.1",
+  "version": "1.4.2",
   "description": "ZCode 文件读取审计:每轮回复原文不变、末尾仅追加可折叠的读取+速度审计区域(行级范围/子代理覆盖/会话累计);/audit 按需速览与跨会话复盘;auto 可关;直查原生库、脚本算清单、模型只复读",
   "author": { "name": "verywell" },
   "license": "MIT",
